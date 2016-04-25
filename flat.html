@@ -19,16 +19,16 @@
 		<script>
     var scene, camera, renderer;
     var geometry, material, mesh, light;
-    var length = 8;
-		var width = 8;
+    var length = 2;
+		var width = 2;
 
-    var layer = 7;
-    var fuse = 7;
-    var fact = 15;
-    var noise = 5;
+    var layer = 8;
+    var fuse = 4;
+    var fact = 20;
+    var noise = 800;
 		var retain = 1;
 		var breadth = 8;
-		var compress  = 20;
+		var compress  = 1;
     init();
     animate();
 
@@ -62,7 +62,7 @@
           for(var b = 0;b < length;b++){
 						tempgrid[b] = [];
             for(var c = 0;c < width;c++){
-              tempgrid[b][c] = planargrid[Math.floor(b/2)][Math.floor(c/2)]*2.2+(Math.random()-.5)*noise;
+              tempgrid[b][c] = 1/(planargrid[Math.floor(b/2)][Math.floor(c/2)])+(Math.random()-.5)*noise;
             }
           }
           planargrid = tempgrid;
@@ -119,7 +119,7 @@
 				water.rotationz = Math.PI;
 				water.position.z = -1000-width*fact/2;
 				water.position.x = -length*fact/2;
-				water.position.y = -100;
+				water.position.y = -50;
 				scene.add(water);
 
         renderer = new THREE.WebGLRenderer();
