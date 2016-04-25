@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - geometry - cube</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				margin: 0px;
+				background-color: #000000;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="three.min.js"></script>
+
+		<script>
+    var scene, camera, renderer;
+    var geometry, material, mesh, light;
+    var length = 8;
+		var width = 8;
+
+    var layer = 7;
+    var fuse = 7;
+    var fact = 15;
+    var noise = 5;
+		var retain = 1;
+		var breadth = 8;
+		var compress  = 20;
+    init();
+    animate();
+
+    function init() {
+
+        scene = new THREE.Scene();
+
+        camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
+
+				light = new THREE.PointLight( 0xfee8a9, 1, 100000 );
+				light.position.set( 0, 0, 0 );
+				scene.add( light );
+
+				//var cubegeom = new THREE.BoxGeometry( 200, 200, 200 );
+				//var mat = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
+
+				//var cubemesh = new THREE.Mesh(cubegeom,mat);
+			//	scene.add(cubemesh);
+
+        var planargrid = [];
+				for(var a = 0;a<length;a++){
+					planargrid[a] = [];
+					for(var b = 0;b<length;b++){
+						planargrid[a][b] = Math.random()-.5;
+					}
+				}
+        for(var a = 0;a<layer;a++){
+          var tempgrid = [];
+          length*=2;
+          width*=2;
+          for(var b = 0;b < length;b++){
+						tempgrid[b] = [];
+            for(var c = 0;c < width;c++){
+              tempgrid[b][c] = planargrid[Math.floor(b/2)][Math.floor(c/2)]*2.2+(Math.random()-.5)*noise;
+            }
+          }
+          planargrid = tempgrid;
+        }
+
+				for(var l = 0;l<fuse;l++){
+					var tempgrid = [];
+					for(var a = 0;a<length;a++){
+						tempgrid[a] = [];
+						for(var b = 0;b<width;b++){
+							var count = 0;
+							var height = 0;
+							for(var i = -breadth;i<=breadth;i++){
+								for(var j = -breadth;j<=breadth;j++){
+									if(a+i>=0 && a+i<length && b+j>=0 && b+j<width) {
+										count++;
+										if(i==0 && j==0)
+											height += planargrid[a+i][b+j]*retain;
+										else
+											height += planargrid[a+i][b+j];
+									}
+								}
+							}
+							tempgrid[a][b] = height/(count+retain-1);
+						}
+					}
+					planargrid = tempgrid;
+				}
+
+        geometry = new THREE.Geometry();
+
+        for(var a = 0;a<length;a++){
+          for(var b = 0;b<width;b++){
+            geometry.vertices.push(new THREE.Vector3(a*fact,planargrid[a][b]*fact/compress,b*fact));
+            }
+        }
+        for(var a =0;a<length*width-width-1;a++){
+          	if(a%width!=width-1){
+          	geometry.faces.push(new THREE.Face3(a,a+1,a+width));
+          	geometry.faces.push(new THREE.Face3(a+1,a+1+width,a+width));
+        	}
+        }
+				geometry.computeFaceNormals();
+        material = new THREE.MeshPhongMaterial( { color: 0x25de61, specular: 0x000000, shininess: 10 } );
+				//material = new THREE.MeshNormalMaterial();
+
+        mesh = new THREE.Mesh( geometry, material );
+        mesh.rotation.y = Math.PI
+				mesh.position.z = -1000;
+
+        scene.add(mesh);
+				var water = new THREE.Mesh(new THREE.PlaneGeometry(length*fact,width*fact), new THREE.MeshBasicMaterial( {color: 0x2599fa} ));
+				water.rotation.x = -Math.PI/2;
+				water.rotationz = Math.PI;
+				water.position.z = -1000-width*fact/2;
+				water.position.x = -length*fact/2;
+				water.position.y = -100;
+				scene.add(water);
+
+        renderer = new THREE.WebGLRenderer();
+        renderer.setSize( window.innerWidth, window.innerHeight );
+
+        document.body.appendChild( renderer.domElement );
+
+    }
+    var keyw = false;
+    var keys = false;
+    var keyd = false;
+    var keya = false;
+    var keyspace = false;
+    var keyctrl = false;
+		var keyc = false;
+    document.addEventListener('keydown', function(event) {
+    if(event.keyCode ==  65) {
+        keya = true;
+    }
+    if(event.keyCode == 68) {
+        keyd = true;
+    }
+    if(event.keyCode ==  83) {
+        keys = true;
+    }
+    if(event.keyCode == 87) {
+        keyw = true;
+    }
+    if(event.keyCode == 32){
+      keyspace = true;
+    }
+		if(event.keyCode == 67){
+      keyc = true;
+    }
+    });
+
+    document.addEventListener('keyup', function(event) {
+    if(event.keyCode == 65) {
+        keya = false;
+    }
+    if(event.keyCode == 68) {
+        keyd = false;
+    }
+    if(event.keyCode == 83) {
+        keys = false;
+    }
+    if(event.keyCode == 87) {
+        keyw = false;
+    }
+    if(event.keyCode == 32){
+      keyspace = false;
+    }
+		if(event.keyCode == 67){
+      keyc = false;
+    }
+    });
+
+    function animate() {
+				light.position.set(camera.position.x,camera.position.y,camera.position.z);
+        requestAnimationFrame( animate );
+        if(keya){
+        camera.position.x -= 10;
+        }
+        if(keyd){
+        camera.position.x += 10;
+        }
+        if(keyw){
+        camera.position.z -= 10;
+        }
+        if(keys){
+        camera.position.z += 10;
+        }
+        if(keyspace)
+        camera.position.y += 10;
+				if(keyc)
+				camera.position.y -= 10;
+
+        renderer.render( scene, camera );
+
+    }
+		</script>
+
+	</body>
+</html>
