@@ -28,7 +28,7 @@
     var noise = 800;
 		var retain = 1;
 		var breadth = 8;
-		var compress  = 1;
+		var compress  = .91;
     init();
     animate();
 
@@ -62,7 +62,7 @@
           for(var b = 0;b < length;b++){
 						tempgrid[b] = [];
             for(var c = 0;c < width;c++){
-              tempgrid[b][c] = 1/(planargrid[Math.floor(b/2)][Math.floor(c/2)])+(Math.random()-.5)*noise;
+							tempgrid[b][c] = 1/(planargrid[Math.floor(b/2)][Math.floor(c/2)]+(Math.random()-.5)*noise/planargrid[Math.floor(b/2)][Math.floor(c/2)])+(Math.random()-.5)*noise;
             }
           }
           planargrid = tempgrid;
@@ -91,7 +91,6 @@
 					}
 					planargrid = tempgrid;
 				}
-
         geometry = new THREE.Geometry();
 
         for(var a = 0;a<length;a++){
@@ -116,12 +115,10 @@
         scene.add(mesh);
 				var water = new THREE.Mesh(new THREE.PlaneGeometry(length*fact,width*fact), new THREE.MeshBasicMaterial( {color: 0x2599fa} ));
 				water.rotation.x = -Math.PI/2;
-				water.rotationz = Math.PI;
 				water.position.z = -1000-width*fact/2;
 				water.position.x = -length*fact/2;
 				water.position.y = -50;
 				scene.add(water);
-
         renderer = new THREE.WebGLRenderer();
         renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -135,6 +132,8 @@
     var keyspace = false;
     var keyctrl = false;
 		var keyc = false;
+		var keyleft = false;
+		var keyright = false;
     document.addEventListener('keydown', function(event) {
     if(event.keyCode ==  65) {
         keya = true;
@@ -154,6 +153,13 @@
 		if(event.keyCode == 67){
       keyc = true;
     }
+		if(event.keyCode == 37){
+			keyleft = true;
+		}
+		if(event.keyCode == 39){
+			keyright = true;
+		}
+
     });
 
     document.addEventListener('keyup', function(event) {
@@ -175,27 +181,46 @@
 		if(event.keyCode == 67){
       keyc = false;
     }
+		if(event.keyCode == 37){
+			keyleft = false;
+		}
+		if(event.keyCode == 39){
+			keyright = false;
+		}
+
     });
 
     function animate() {
 				light.position.set(camera.position.x,camera.position.y,camera.position.z);
         requestAnimationFrame( animate );
         if(keya){
-        camera.position.x -= 10;
+					camera.position.z += 20*Math.sin(camera.rotation.y);
+					camera.position.x -= 20*Math.cos(camera.rotation.y);
         }
         if(keyd){
-        camera.position.x += 10;
-        }
+					camera.position.z -= 20*Math.sin(camera.rotation.y);
+					camera.position.x += 20*Math.cos(camera.rotation.y);
+				}
         if(keyw){
-        camera.position.z -= 10;
+        	camera.position.z -= 20*Math.cos(camera.rotation.y);
+					camera.position.x -= 20*Math.sin(camera.rotation.y);
         }
         if(keys){
-        camera.position.z += 10;
-        }
-        if(keyspace)
-        camera.position.y += 10;
-				if(keyc)
-				camera.position.y -= 10;
+					camera.position.z += 20*Math.cos(camera.rotation.y);
+					camera.position.x += 20*Math.sin(camera.rotation.y);
+				}
+        if(keyspace){
+        	camera.position.y += 10;
+				}
+				if(keyc){
+					camera.position.y -= 10;
+				}
+				if(keyleft){
+					camera.rotation.y += .01;
+				}
+				if(keyright){
+					camera.rotation.y -= .01;
+				}
 
         renderer.render( scene, camera );
 
