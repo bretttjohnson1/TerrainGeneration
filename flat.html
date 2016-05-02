@@ -22,13 +22,13 @@
     var length = 2;
 		var width = 2;
 
-    var layer = 8;
-    var fuse = 4;
+    var layer = 9;
+    var fuse = 8;
     var fact = 20;
-    var noise = 800;
+    var noise = 20;
 		var retain = 1;
 		var breadth = 8;
-		var compress  = .91;
+		var compress  = 4;
     init();
     animate();
 
@@ -62,11 +62,12 @@
           for(var b = 0;b < length;b++){
 						tempgrid[b] = [];
             for(var c = 0;c < width;c++){
-							tempgrid[b][c] = 1/(planargrid[Math.floor(b/2)][Math.floor(c/2)]+(Math.random()-.5)*noise/planargrid[Math.floor(b/2)][Math.floor(c/2)])+(Math.random()-.5)*noise;
+								tempgrid[b][c] = (planargrid[Math.floor(b/2)][Math.floor(c/2)])+(Math.random()-.5)*noise*(layer-a+1);
             }
           }
           planargrid = tempgrid;
         }
+
 
 				for(var l = 0;l<fuse;l++){
 					var tempgrid = [];
@@ -86,7 +87,7 @@
 									}
 								}
 							}
-							tempgrid[a][b] = height/(count+retain-1);
+							tempgrid[a][b] = (height/(count+retain-1));
 						}
 					}
 					planargrid = tempgrid;
