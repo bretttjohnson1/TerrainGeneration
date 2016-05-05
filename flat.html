@@ -38,7 +38,7 @@
 
         camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
 
-				light = new THREE.PointLight( 0xfee8a9, 1, 100000 );
+				light = new THREE.PointLight( 0xffffff, 1.3, 100000 );
 				light.position.set( 0, 0, 0 );
 				scene.add( light );
 
@@ -93,20 +93,29 @@
 					planargrid = tempgrid;
 				}
         geometry = new THREE.Geometry();
-
+				var max = 0;
         for(var a = 0;a<length;a++){
           for(var b = 0;b<width;b++){
+						if(planargrid[a][b]*fact/compress>max)
+							max = planargrid[a][b]*fact/compress;
             geometry.vertices.push(new THREE.Vector3(a*fact,planargrid[a][b]*fact/compress,b*fact));
             }
         }
         for(var a =0;a<length*width-width-1;a++){
           	if(a%width!=width-1){
-          	geometry.faces.push(new THREE.Face3(a,a+1,a+width));
-          	geometry.faces.push(new THREE.Face3(a+1,a+1+width,a+width));
+							var color  = geometry.vertices[a].y/max*1.2;
+							if(color>1)color=1;
+							var face1 = new THREE.Face3(a,a+1,a+width);
+							face1.color = new THREE.Color(color,1,color);
+							var face2 = new THREE.Face3(a+1,a+1+width,a+width);
+							face2.color= new THREE.Color(color,1,color);
+
+          	geometry.faces.push(face1);
+          	geometry.faces.push(face2);
         	}
         }
 				geometry.computeFaceNormals();
-        material = new THREE.MeshPhongMaterial( { color: 0x25de61, specular: 0x000000, shininess: 10 } );
+        material = new THREE.MeshLambertMaterial( {color: 0xffffff, vertexColors: THREE.FaceColors, specular:  0xffffff, shininess: 10 } );
 				//material = new THREE.MeshNormalMaterial();
 
         mesh = new THREE.Mesh( geometry, material );
