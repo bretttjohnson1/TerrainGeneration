@@ -14,21 +14,28 @@
 	</head>
 	<body>
 
-		<script src="three.min.js"></script>
+		<script src="http://threejs.org/build/three.min.js"></script>
 
 		<script>
     var scene, camera, renderer;
     var geometry, material, mesh, light;
     var length = 2;
-		var width = 2;
+	 var width = 2;
 
-    var layer = 9;
+    //number of iterations of the terrain generation higher = more points
+    var layer = 8;
+    //number of smoothing iterations
     var fuse = 8;
+    //scaling factor for display purposes -- should not be changed
     var fact = 20;
+    //amount of randomness in generation algorithm
     var noise = 20;
-		var retain = 1;
-		var breadth = 8;
-		var compress  = 4;
+    //used to retain original value of given point in smoothing algorithm -- set at one does nothing
+	 var retain = 1;
+    //breadth of smoothing algorithm for each point
+	 var breadth = 8;
+    //vertically compresses the terrain
+	 var compress  = 4;
     init();
     animate();
 
