@@ -6,3 +6,4 @@ It repeats this as many times as the program specifies and then smooths the terr
 The height of each child node is given by the parent's height * noise * the layer number
 The layer number ensures that big changes happen in the higher layers and little fine changes in the lower layers.
 The noise is just random.
+Feel free to download the HTML and change the values.
